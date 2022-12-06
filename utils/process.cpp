@@ -1,4 +1,4 @@
-#include "./get_childs.hpp"
+#include "./process.hpp"
 #include <cstdio>
 #include <iostream>
 #include <sstream>
@@ -35,9 +35,9 @@ namespace
         return std::make_pair(column, value);
     }
 
-    waybar::wnd::utils::ProcessChilds::Process find_process(std::string_view pid)
+    waybar::wnd::utils::ProcessTree::Process find_process(std::string_view pid)
     {
-        waybar::wnd::utils::ProcessChilds::Process process;
+        waybar::wnd::utils::ProcessTree::Process process;
 
         std::string root = "/proc/";
         std::ifstream stream(root + std::string(pid) + std::string("/status"));
@@ -61,6 +61,7 @@ namespace
                 else if("PPid" == line.first)
                 {
                     process.ppid = line.second;
+                    process.memory = waybar::wnd::ProcessMemory::get_memory_for_process(process.pid);
                     break;
                 }
             }
@@ -71,7 +72,7 @@ namespace
         return process;
     }
 
-    void find_childs_for_process(std::string_view pid, std::vector<waybar::wnd::utils::ProcessChilds::Process>& ref)
+    void find_childs_for_process(std::string_view pid, std::vector<waybar::wnd::utils::ProcessTree::Process>& ref)
     {
         std::string root = "/proc/";
 
@@ -80,12 +81,12 @@ namespace
         for(const auto& pathIterator : std::filesystem::directory_iterator(p))
         {
             std::string id = pathIterator.path().filename();
-            waybar::wnd::utils::ProcessChilds::Process info = find_process(id);
+            waybar::wnd::utils::ProcessTree::Process info = find_process(id);
 
             if(pid == info.ppid)
             {
-                ref.push_back(info);
                 find_childs_for_process(info.pid, info.child);
+                ref.push_back(info);
             }
         }
     }
@@ -93,15 +94,9 @@ namespace
 
 namespace waybar::wnd::utils
 {
-
-    ProcessChilds::Process ProcessChilds::get_process(int pid)
+    ProcessTree::Process ProcessTree::get_tree_for_process(std::string_view pid)
     {
-        return ProcessChilds::get_process(std::to_string(pid));
-    }
-
-    ProcessChilds::Process ProcessChilds::get_process(std::string_view pid)
-    {
-        waybar::wnd::utils::ProcessChilds::Process head = find_process(pid);
+        waybar::wnd::utils::ProcessTree::Process head = find_process(pid);
         find_childs_for_process(pid, head.child);
         return head;
     }

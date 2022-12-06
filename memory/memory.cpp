@@ -1,11 +1,6 @@
 #include "memory.hpp"
-#include "../utils/get_childs.hpp"
-#include <iostream>
 #include <sstream>
-#include <string>
-#include <string_view>
 #include <unistd.h>
-#include <vector>
 #include <fstream>
 
 namespace {
@@ -18,10 +13,10 @@ namespace {
 
 namespace 
 {
-    waybar::wnd::ProcessMemoryInfo::Memory get_process_memory(std::string_view pid)
+    waybar::wnd::ProcessMemory::Memory get_process_memory(std::string_view pid)
     {
         std::ifstream stream;
-        waybar::wnd::ProcessMemoryInfo::Memory info;
+        waybar::wnd::ProcessMemory::Memory info;
         std::stringstream buffer;
 
         stream.open("/proc/" + std::string(pid) + "/statm");
@@ -36,44 +31,19 @@ namespace
 
         return info;
     }
-
-    void accumulate_memory(const waybar::wnd::utils::ProcessChilds::Process& process, waybar::wnd::ProcessMemoryInfo::Memory& total)
-    {
-        waybar::wnd::ProcessMemoryInfo::Memory memory = get_process_memory(process.pid);
-
-        total.vmSize += memory.vmSize;
-        total.vmRss += memory.vmRss;
-        total.shared += memory.shared;
-        total.trs += memory.trs;
-        total.drs += memory.drs;
-        total.dirtyPages += memory.dirtyPages;
-
-        for(const waybar::wnd::utils::ProcessChilds::Process& var : process.child)
-        {
-            accumulate_memory(var, total);
-        }
-    }
-
-    waybar::wnd::ProcessMemoryInfo::Memory accumulate_memory(const waybar::wnd::utils::ProcessChilds::Process& process)
-    {
-        waybar::wnd::ProcessMemoryInfo::Memory total = {};
-
-        accumulate_memory(process, total);
-
-        return total;
-    }
 }
 
 namespace waybar::wnd
 {
-    ProcessMemoryInfoFormat ProcessMemoryInfo::get_memory(int pid)
+    waybar::wnd::ProcessMemory::Memory ProcessMemory::get_memory_for_process(std::string_view pid)
     {
-        utils::ProcessChilds::Process process = utils::ProcessChilds::get_process(pid);
-        
-        if(process.child.empty()) return ProcessMemoryInfoFormat(0);
+        waybar::wnd::ProcessMemory::Memory memory = get_process_memory(pid);
 
-        waybar::wnd::ProcessMemoryInfo::Memory total = accumulate_memory(process);
+        memory.vmSize = memory.vmSize * PAGE_SIZE;
+        memory.vmRss = memory.vmRss * PAGE_SIZE;
+        memory.drs = memory.drs * PAGE_SIZE;
+        memory.trs = memory.trs * PAGE_SIZE;
 
-        return ProcessMemoryInfoFormat(total.vmRss * PAGE_SIZE);
+        return memory;
     }
 };

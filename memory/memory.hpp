@@ -1,21 +1,17 @@
 #pragma once
-
-#include <fstream>
+#include <string_view>
 
 namespace waybar::wnd
 {
     class ProcessMemoryInfoFormat
     {
-        private:
-            long _memory;
         public:
             enum class Format {Mb, Gb, Kb};
-            ProcessMemoryInfoFormat(long memory);
-            bool is_valid(long value) const;
-            float operator ()(ProcessMemoryInfoFormat::Format format) const;
+            static bool is_valid(long value);
+            static float format(long value, ProcessMemoryInfoFormat::Format format);
     };
 
-    class ProcessMemoryInfo
+    class ProcessMemory
     {
         public:
             struct Memory
@@ -28,6 +24,6 @@ namespace waybar::wnd
                 long drs;
                 long dirtyPages;
             };
-            static ProcessMemoryInfoFormat get_memory(int pid);
+            static waybar::wnd::ProcessMemory::Memory get_memory_for_process(std::string_view pid);
     };
 };
