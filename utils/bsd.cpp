@@ -27,7 +27,7 @@ namespace
 		process.pid = std::to_string(static_cast<int>(kp->ki_pid));
 		process.ppid = std::to_string(static_cast<int>(kp->ki_ppid));
 
-		waybar::wnd::ProcessMemory::Memory memory = {0};
+		waybar::wnd::Memory memory = {0};
 		memory.vmSize = kp->ki_size;
 		memory.vmRss = kp->ki_rssize * page_size;
 		memory.trs = kp->ki_tsize;
@@ -46,7 +46,6 @@ namespace
         kvm_t* kd = kvm_open(NULL, MEM_PATH, NULL, O_RDONLY, errbuf);
         if(NULL == kd)
         {
-            std::cout<<"Init kvm_t error: "<<errbuf<<std::endl;
             return {0};
         }
 
@@ -80,7 +79,6 @@ namespace
         kvm_t* kd = kvm_open(NULL, MEM_PATH, NULL, O_RDONLY, errbuf);
         if(NULL == kd)
         {
-            std::cout<<"Init kvm_t error: "<<errbuf<<std::endl;
             return;
         }
 
