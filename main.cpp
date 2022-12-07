@@ -9,7 +9,7 @@ int main (int argc, char *argv[])
 {
     while(true)
     {
-        waybar::wnd::utils::ProcessTree::Process processTree = waybar::wnd::utils::ProcessTree::get_tree_for_process("704");
+        waybar::wnd::utils::ProcessTree::Process processTree = waybar::wnd::utils::ProcessTree::get_tree_for_process("901");
         waybar::wnd::display::Display::show(processTree);
     }
     return 0;
