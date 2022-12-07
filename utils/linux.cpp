@@ -86,7 +86,7 @@ namespace
             std::string id = pathIterator.path().filename();
             waybar::wnd::utils::ProcessTree::Process info = find_process(id);
 
-            if(pid == info.ppid)
+            if(info.pid == id && pid == info.ppid)
             {
                 find_childs_for_process(info.pid, info.child);
                 ref.push_back(info);
