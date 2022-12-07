@@ -1,4 +1,4 @@
-#include "memory.hpp"
+#include "memory_format.hpp"
 #include <cmath>
 
 namespace waybar::wnd

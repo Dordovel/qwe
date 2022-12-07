@@ -1,22 +1,25 @@
-#include "memory.hpp"
+#include "process_memory_linux.hpp"
+#include <iostream>
 #include <sstream>
 #include <unistd.h>
 #include <fstream>
+#include <string>
 
-namespace {
+#ifdef __linux__
+
+namespace
+{
+
 #ifdef _SC_PAGESIZE
         const static int PAGE_SIZE = sysconf(_SC_PAGESIZE);
 #elif _SC_PAGE_SIZE
         const static int PAGE_SIZE = sysconf(_SC_PAGE_SIZE);
 #endif
-};
 
-namespace 
-{
-    waybar::wnd::ProcessMemory::Memory get_process_memory(std::string_view pid)
+    waybar::wnd::Memory get_process_memory(std::string_view pid)
     {
         std::ifstream stream;
-        waybar::wnd::ProcessMemory::Memory info;
+        waybar::wnd::Memory info = {0};
         std::stringstream buffer;
 
         stream.open("/proc/" + std::string(pid) + "/statm");
@@ -35,9 +38,9 @@ namespace
 
 namespace waybar::wnd
 {
-    waybar::wnd::ProcessMemory::Memory ProcessMemory::get_memory_for_process(std::string_view pid)
+    waybar::wnd::Memory ProcessMemory::get_memory_for_process(std::string_view pid)
     {
-        waybar::wnd::ProcessMemory::Memory memory = get_process_memory(pid);
+        waybar::wnd::Memory memory = get_process_memory(pid);
 
         memory.vmSize = memory.vmSize * PAGE_SIZE;
         memory.vmRss = memory.vmRss * PAGE_SIZE;
@@ -47,3 +50,4 @@ namespace waybar::wnd
         return memory;
     }
 };
+#endif

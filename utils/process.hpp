@@ -3,7 +3,7 @@
 #include <string>
 #include <string_view>
 #include <vector>
-#include "../memory/memory.hpp"
+#include "memory.hpp"
 
 namespace waybar::wnd::utils
 {
@@ -16,7 +16,7 @@ namespace waybar::wnd::utils
                 std::string pid;
                 std::string ppid;
 
-                ProcessMemory::Memory memory;
+                Memory memory;
 
                 std::vector<Process> child;
             };

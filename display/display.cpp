@@ -1,5 +1,6 @@
 #include "./display.hpp"
 #include <iostream>
+#include "memory_format.hpp"
 
 namespace 
 {
