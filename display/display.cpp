@@ -1,11 +1,17 @@
 #include "./display.hpp"
+#include <cmath>
 #include <ios>
 #include <iostream>
 #include "memory_format.hpp"
+#include "../system/cpu.hpp"
 
 namespace 
 {
-    void show(const waybar::wnd::utils::ProcessTree::Process& process, int depth)
+};
+
+namespace wnd::display
+{
+    void Display::show(const wnd::utils::ProcessTree::Process& process, int depth)
     {
         for(int i = 0; i < depth; ++i)
         {
@@ -17,21 +23,28 @@ namespace
             std::cout<<"└";
         }
 
-        std::cout<<process.pid<< " "<<process.name<< " Mem: "<< waybar::wnd::ProcessMemoryInfoFormat::format(process.memory.vmRss, waybar::wnd::ProcessMemoryInfoFormat::Format::Mb) << " Mb"<<std::endl;
+        std::cout << process.pid << " "
+                    << process.name
+                    << " Mem: "
+                    << wnd::ProcessMemoryInfoFormat::format(process.memory.vmRss, wnd::ProcessMemoryInfoFormat::Format::Mb)
+                    << " Mb "
+                    << " %Cpu "
+                    << std::round((100 * 
+                                        (static_cast<float>(process.cpuTime - process.cpuTime_old)
+                                            / (system::Cpu::get_cpu_total() - this->_cpuTick))) * 10) / 10
+                                  
+                    << std::endl;
 
-        for(const waybar::wnd::utils::ProcessTree::Process& var : process.child)
+        for(const wnd::utils::ProcessTree::Process& var : process.child)
         {
             show(var, depth + 1);
-			depth = 0;
         }
     }
-};
 
-namespace waybar::wnd::display
-{
-    void Display::show(const utils::ProcessTree::Process & process)
+    void Display::show(const utils::ProcessTree::Process& process)
     {
         int depth = 0;
-        ::show(process, depth);
+        show(process, depth);
+        this->_cpuTick = system::Cpu::get_cpu_total();
     }
 };

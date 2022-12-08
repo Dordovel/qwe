@@ -1,11 +1,15 @@
 #pragma once
 #include "../utils/process.hpp"
 
-namespace waybar::wnd::display
+namespace wnd::display
 {
     class Display
     {
+        private:
+            long _cpuTick;
+
+            void show(const wnd::utils::ProcessTree::Process& process, int depth);
         public:
-            static void show(const utils::ProcessTree::Process&);
+            void show(const utils::ProcessTree::Process&);
     };
 };

@@ -115,7 +115,7 @@ CpuTime get_cpu_info()
 
 int main (int argc, char *argv[])
 {
-    int currentPid = 24714;
+    int currentPid = 23765;
     int oldCpu, oldUse, oldTotal;
     oldCpu = oldUse = oldTotal = 0;
 

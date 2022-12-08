@@ -5,7 +5,7 @@
 #include <vector>
 #include "memory.hpp"
 
-namespace waybar::wnd::utils
+namespace wnd::utils
 {
     class ProcessTree
     {
@@ -17,9 +17,16 @@ namespace waybar::wnd::utils
                 std::string ppid;
 
                 Memory memory;
+                Memory memory_old;
+
+                long cpuTime;
+                long cpuTime_old;
 
                 std::vector<Process> child;
             };
-            static Process get_tree_for_process(std::string_view pid);
+            Process get_tree_for_process(std::string_view pid);
+
+        private:
+            std::vector<struct Process> _processes;
     };
 };

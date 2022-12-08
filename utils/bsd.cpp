@@ -17,9 +17,9 @@
 
 namespace
 {
-    waybar::wnd::utils::ProcessTree::Process create_process_struct(kinfo_proc* kp)
+    wnd::utils::ProcessTree::Process create_process_struct(kinfo_proc* kp)
 	{
-		waybar::wnd::utils::ProcessTree::Process process;
+		wnd::utils::ProcessTree::Process process;
 
 		std::size_t page_size = getpagesize();
 
@@ -27,7 +27,7 @@ namespace
 		process.pid = std::to_string(static_cast<int>(kp->ki_pid));
 		process.ppid = std::to_string(static_cast<int>(kp->ki_ppid));
 
-		waybar::wnd::Memory memory = {0};
+		wnd::Memory memory = {0};
 		memory.vmSize = kp->ki_size;
 		memory.vmRss = kp->ki_rssize * page_size;
 		memory.trs = kp->ki_tsize;
@@ -38,7 +38,7 @@ namespace
 		return process;
 	}
 
-    waybar::wnd::utils::ProcessTree::Process find_process(std::string_view pid)
+    wnd::utils::ProcessTree::Process find_process(std::string_view pid)
     {
         int pidi = std::stoi(std::string(pid));
 
@@ -51,13 +51,13 @@ namespace
 
         int cnt;
         kinfo_proc* kp = kvm_getprocs(kd, KERN_PROC_PID, pidi, &cnt);
-        waybar::wnd::utils::ProcessTree::Process process = create_process_struct(kp);
+        wnd::utils::ProcessTree::Process process = create_process_struct(kp);
         kvm_close(kd);
 
         return process;
     }
 
-    void find_childs_for_process(std::string_view pid, kinfo_proc* kinfo, int cnt, std::vector<waybar::wnd::utils::ProcessTree::Process>& ref)
+    void find_childs_for_process(std::string_view pid, kinfo_proc* kinfo, int cnt, std::vector<wnd::utils::ProcessTree::Process>& ref)
     {
         int pidi = std::stoi(std::string(pid));
 
@@ -66,14 +66,14 @@ namespace
             kinfo_proc &kp = kinfo[i];
             if(kp.ki_ppid == pidi)
             {
-                waybar::wnd::utils::ProcessTree::Process info = create_process_struct(&kp);
+                wnd::utils::ProcessTree::Process info = create_process_struct(&kp);
                 find_childs_for_process(info.pid, kinfo, cnt, info.child);
                 ref.push_back(info);
             }
         }
     }
 
-    void find_childs_for_process(std::string_view pid, std::vector<waybar::wnd::utils::ProcessTree::Process>& ref)
+    void find_childs_for_process(std::string_view pid, std::vector<wnd::utils::ProcessTree::Process>& ref)
     {
         char errbuf[_POSIX2_LINE_MAX] = {0};
         kvm_t* kd = kvm_open(NULL, MEM_PATH, NULL, O_RDONLY, errbuf);
@@ -91,11 +91,11 @@ namespace
     }
 }
 
-namespace waybar::wnd::utils
+namespace wnd::utils
 {
     ProcessTree::Process ProcessTree::get_tree_for_process(std::string_view pid)
     {
-        waybar::wnd::utils::ProcessTree::Process head = find_process(pid);
+        wnd::utils::ProcessTree::Process head = find_process(pid);
         find_childs_for_process(pid, head.child);
         return head;
     }

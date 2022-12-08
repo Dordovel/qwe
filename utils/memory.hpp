@@ -1,6 +1,6 @@
 #pragma once
 
-namespace waybar::wnd
+namespace wnd
 {
     struct Memory
     {

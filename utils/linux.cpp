@@ -11,6 +11,7 @@
 #include <string_view>
 #include <utility>
 #include "../memory/process_memory_linux.hpp"
+#include "../cpu/process_cpu_linux.hpp"
 
 namespace
 {
@@ -38,9 +39,9 @@ namespace
         return std::make_pair(column, value);
     }
 
-    waybar::wnd::utils::ProcessTree::Process find_process(std::string_view pid)
+    wnd::utils::ProcessTree::Process read_process(std::string_view pid)
     {
-        waybar::wnd::utils::ProcessTree::Process process;
+        wnd::utils::ProcessTree::Process process;
 
         std::string root = "/proc/";
         std::ifstream stream(root + std::string(pid) + std::string("/status"));
@@ -64,7 +65,6 @@ namespace
                 else if("PPid" == line.first)
                 {
                     process.ppid = line.second;
-                    process.memory = waybar::wnd::ProcessMemory::get_memory_for_process(process.pid);
                     break;
                 }
             }
@@ -75,32 +75,66 @@ namespace
         return process;
     }
 
-    void find_childs_for_process(std::string_view pid, std::vector<waybar::wnd::utils::ProcessTree::Process>& ref)
+    void find_childs_for_process(std::string_view pid,
+                                 std::vector<wnd::utils::ProcessTree::Process>& processes,
+                                 std::vector<wnd::utils::ProcessTree::Process>&& oldProcesses,
+                                 std::vector<wnd::utils::ProcessTree::Process>& ref)
     {
+        for(auto& process : processes)
+        {
+            if(process.ppid == pid)
+            {
+                find_childs_for_process(process.pid, processes, std::move(oldProcesses), process.child);
+                process.memory = wnd::ProcessMemory::get_memory_for_process(process.pid);
+                process.cpuTime = wnd::ProcessCpu::get_cpu_for_process(process.pid);
+                
+                auto oldState = std::find_if(oldProcesses.cbegin(), oldProcesses.cend(),
+                                             [ &process ](const auto& old){return old.pid == process.pid;});
+
+                if(oldState != oldProcesses.cend())
+                {
+                    process.cpuTime_old = oldState->cpuTime;
+                    process.memory_old = std::move(oldState->memory);
+                }
+                
+                ref.push_back(process);
+            }
+        }
+    }
+
+    std::vector<wnd::utils::ProcessTree::Process> get_all_processes()
+    {
+        std::vector<wnd::utils::ProcessTree::Process> processes;
+
         std::string root = "/proc/";
 
         std::filesystem::path p(root);
 
         for(const auto& pathIterator : std::filesystem::directory_iterator(p))
         {
-            std::string id = pathIterator.path().filename();
-            waybar::wnd::utils::ProcessTree::Process info = find_process(id);
+            if(pathIterator.is_symlink()) continue;
 
-            if(info.pid == id && pid == info.ppid)
-            {
-                find_childs_for_process(info.pid, info.child);
-                ref.push_back(info);
-            }
+            std::string id = pathIterator.path().filename();
+            wnd::utils::ProcessTree::Process process = read_process(id);
+            processes.push_back(std::move(process));
         }
+
+        return processes;
     }
 }
 
-namespace waybar::wnd::utils
+namespace wnd::utils
 {
     ProcessTree::Process ProcessTree::get_tree_for_process(std::string_view pid)
     {
-        waybar::wnd::utils::ProcessTree::Process head = find_process(pid);
-        find_childs_for_process(pid, head.child);
+        std::vector<wnd::utils::ProcessTree::Process> processes = get_all_processes();
+        
+        wnd::utils::ProcessTree::Process head = read_process(pid);
+        head.memory = wnd::ProcessMemory::get_memory_for_process(head.pid);
+        head.cpuTime = wnd::ProcessCpu::get_cpu_for_process(head.pid);
+        find_childs_for_process(pid, processes, std::move(this->_processes), head.child);
+
+        this->_processes = std::move(processes);
         return head;
     }
 };

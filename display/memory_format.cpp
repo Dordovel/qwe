@@ -1,7 +1,7 @@
 #include "memory_format.hpp"
 #include <cmath>
 
-namespace waybar::wnd
+namespace wnd
 {
     constexpr float b_to_m = 1024 * 1024;
     constexpr float b_to_g = b_to_m * 1024;

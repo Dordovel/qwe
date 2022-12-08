@@ -16,10 +16,10 @@ namespace
         const static int PAGE_SIZE = sysconf(_SC_PAGE_SIZE);
 #endif
 
-    waybar::wnd::Memory get_process_memory(std::string_view pid)
+    wnd::Memory get_process_memory(std::string_view pid)
     {
         std::ifstream stream;
-        waybar::wnd::Memory info = {0};
+        wnd::Memory info = {0};
         std::stringstream buffer;
 
         stream.open("/proc/" + std::string(pid) + "/statm");
@@ -36,11 +36,11 @@ namespace
     }
 }
 
-namespace waybar::wnd
+namespace wnd
 {
-    waybar::wnd::Memory ProcessMemory::get_memory_for_process(std::string_view pid)
+    wnd::Memory ProcessMemory::get_memory_for_process(std::string_view pid)
     {
-        waybar::wnd::Memory memory = get_process_memory(pid);
+        wnd::Memory memory = get_process_memory(pid);
 
         memory.vmSize = memory.vmSize * PAGE_SIZE;
         memory.vmRss = memory.vmRss * PAGE_SIZE;
