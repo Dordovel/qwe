@@ -3,11 +3,6 @@
 #include <ios>
 #include <iostream>
 #include "memory_format.hpp"
-#include "../system/cpu.hpp"
-
-namespace 
-{
-};
 
 namespace wnd::display
 {
@@ -29,10 +24,7 @@ namespace wnd::display
                     << wnd::ProcessMemoryInfoFormat::format(process.memory.vmRss, wnd::ProcessMemoryInfoFormat::Format::Mb)
                     << " Mb "
                     << " %Cpu "
-                    << std::round((100 * 
-                                        (static_cast<float>(process.cpuTime - process.cpuTime_old)
-                                            / (system::Cpu::get_cpu_total() - this->_cpuTick))) * 10) / 10
-                                  
+                    <<process.p_cpu
                     << std::endl;
 
         for(const wnd::utils::ProcessTree::Process& var : process.child)
@@ -45,6 +37,5 @@ namespace wnd::display
     {
         int depth = 0;
         show(process, depth);
-        this->_cpuTick = system::Cpu::get_cpu_total();
     }
 };

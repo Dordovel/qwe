@@ -6,13 +6,9 @@
 #include <sys/param.h>
 #include <sys/sysctl.h>
 #include <sys/user.h>
-#include <paths.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <limits.h>
-#include <stdio.h>
-#include <stdlib.h>
-
+#include <cmath>
 #define MEM_PATH "/dev/null"
 
 namespace
@@ -34,6 +30,19 @@ namespace
 		memory.drs = kp->ki_dsize + kp->ki_ssize;
 
 		process.memory = memory;
+
+        static int fscale = [](){
+            int fscale;
+            std::size_t len = sizeof(fscale);
+            if(sysctlbyname("kern.fscale", &fscale, &len, NULL, 0) == 0)
+            {
+                fscale = 2048;
+            }
+
+            return fscale;
+        }();
+
+        process.p_cpu = std::round((100.f * kp->ki_pctcpu / fscale) * 100) / 100;
 
 		return process;
 	}

@@ -16,17 +16,12 @@ namespace wnd::utils
                 std::string pid;
                 std::string ppid;
 
-                Memory memory;
-                Memory memory_old;
+                Memory memory = { 0 };
 
-                long cpuTime;
-                long cpuTime_old;
+                float p_cpu = 0;
 
                 std::vector<Process> child;
             };
             Process get_tree_for_process(std::string_view pid);
-
-        private:
-            std::vector<struct Process> _processes;
     };
 };
