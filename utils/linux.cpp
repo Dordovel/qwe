@@ -1,5 +1,4 @@
 #include "./process.hpp"
-#include <iostream>
 
 #ifdef __linux__
 
@@ -39,8 +38,6 @@ namespace
 
                 long cpu;
                 long cpuLast;
-                    
-                std::vector<Process> child;
             };
 
             std::vector<struct Process> _processes;
@@ -121,9 +118,9 @@ namespace
                 {
                     if(process.ppid == pid)
                     {
-                        wnd::utils::ProcessTree::Process adapter;
+                        std::vector<wnd::utils::ProcessTree::Process> child;
 
-                        find_childs_for_process(process.pid, processes, std::move(oldProcesses), adapter.child);
+                        find_childs_for_process(process.pid, processes, std::move(oldProcesses), child);
                         process.memory = wnd::ProcessMemory::get_memory_for_process(process.pid);
                         process.cpu = wnd::ProcessCpu::get_cpu_for_process(process.pid);
                         
@@ -135,8 +132,10 @@ namespace
                             process.cpuLast = oldState->cpu;
                         }
 
-                        adapter = this->convert(process);
-                        
+                        wnd::utils::ProcessTree::Process adapter;
+                        adapter = this->convert(std::move(process));
+                        adapter.child = std::move(child);
+
                         ref.push_back(adapter);
                     }
                 }
@@ -190,7 +189,6 @@ namespace
 
             this->_processes = std::move(processes);
             this->cpuLast = wnd::system::Cpu::get_cpu_total();
-
             return adapter;
         }
     };

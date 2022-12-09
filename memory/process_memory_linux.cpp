@@ -22,6 +22,8 @@ namespace
         wnd::Memory info = {0};
         std::stringstream buffer;
 
+        int vmSize = 0, vmRss = 0, shared = 0, trs = 0, lrs = 0, drs = 0, dirtyPages = 0;
+
         stream.open("/proc/" + std::string(pid) + "/statm");
         if(stream.is_open())
         {
@@ -29,7 +31,12 @@ namespace
             buffer << stream.rdbuf();
             stream.close();
 
-            buffer >> info.vmSize >> info.vmRss >> info.shared >> info.trs >> info.lrs >> info.drs >> info.dirtyPages;
+            buffer >> vmSize >> vmRss >> shared >> trs >> lrs >> drs >> dirtyPages;
+
+            info.vmSize = vmSize;
+            info.vmRss = vmRss;
+            info.trs = trs;
+            info.drs = drs;
         }
 
         return info;

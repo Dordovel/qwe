@@ -9,4 +9,4 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
 file(GLOB SOURCE_FILES ${CMAKE_SOURCE_DIR}/system/*.cpp ${CMAKE_SOURCE_DIR}/memory/*.cpp ${CMAKE_SOURCE_DIR}/cpu/*.cpp ${CMAKE_SOURCE_DIR}/utils/*.cpp ${CMAKE_SOURCE_DIR}/display/*.cpp)
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES} main.cpp)
-target_link_libraries(${PROJECT_NAME} kvm)
+target_link_libraries(${PROJECT_NAME} fmt)

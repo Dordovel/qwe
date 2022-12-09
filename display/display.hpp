@@ -6,8 +6,9 @@ namespace wnd::display
     class Display
     {
         private:
-            void show(const wnd::utils::ProcessTree::Process& process, int depth);
+            std::string _format;
         public:
-            void show(const utils::ProcessTree::Process&);
+            Display(std::string format);
+            std::string show(const utils::ProcessTree::Process&);
     };
 };

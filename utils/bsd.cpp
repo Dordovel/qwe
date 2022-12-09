@@ -24,10 +24,10 @@ namespace
 		process.ppid = std::to_string(static_cast<int>(kp->ki_ppid));
 
 		wnd::Memory memory = {0};
-		memory.vmSize = kp->ki_size;
+		memory.vmSize = kp->ki_size * page_size;
 		memory.vmRss = kp->ki_rssize * page_size;
-		memory.trs = kp->ki_tsize;
-		memory.drs = kp->ki_dsize + kp->ki_ssize;
+		memory.trs = kp->ki_tsize; * page_size;
+		memory.drs = kp->ki_dsize * page_size;
 
 		process.memory = memory;
 
