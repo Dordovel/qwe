@@ -128,11 +128,27 @@ namespace wnd::utils
     ProcessTree::Process ProcessTree::get_tree_for_process(std::string_view pid)
     {
         std::vector<wnd::utils::ProcessTree::Process> processes = get_all_processes();
+
+        wnd::utils::ProcessTree::Process head;
+
+        auto iter = std::find_if(processes.begin(), processes.end(), [pid](const wnd::utils::ProcessTree::Process& process){return process.pid == pid;});
+        if(processes.end() == iter) return head;
+
+        iter->memory = wnd::ProcessMemory::get_memory_for_process(pid);
+        iter->cpuTime = wnd::ProcessCpu::get_cpu_for_process(pid);
         
-        wnd::utils::ProcessTree::Process head = read_process(pid);
-        head.memory = wnd::ProcessMemory::get_memory_for_process(head.pid);
-        head.cpuTime = wnd::ProcessCpu::get_cpu_for_process(head.pid);
-        find_childs_for_process(pid, processes, std::move(this->_processes), head.child);
+        auto oldState = std::find_if(this->_processes.cbegin(), this->_processes.cend(),
+                                     [ &iter ](const auto& old){return old.pid == iter->pid;});
+
+        if(oldState != this->_processes.cend())
+        {
+            iter->cpuTime_old = oldState->cpuTime;
+            iter->memory_old = std::move(oldState->memory);
+        }
+        
+        head = *iter;
+        
+        find_childs_for_process(head.pid, processes, std::move(this->_processes), head.child);
 
         this->_processes = std::move(processes);
         return head;
