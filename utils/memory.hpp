@@ -9,4 +9,4 @@ namespace wnd
         long trs;
         long drs;
     };
-};
+}; // namespace wnd

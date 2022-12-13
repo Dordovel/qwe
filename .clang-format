@@ -1,0 +1,8 @@
+BreakBeforeBraces: 'Allman'
+AccessModifierOffset: -4
+IndentAccessModifiers: true
+IndentWidth:     4
+CompactNamespaces: 'false'
+TabWidth: '4'
+AlignAfterOpenBracket: AlwaysBreak
+NamespaceIndentation: All

@@ -8,4 +8,4 @@ namespace wnd
         public:
             static long get_cpu_for_process(std::string_view pid);
     };
-};
+}; // namespace wnd

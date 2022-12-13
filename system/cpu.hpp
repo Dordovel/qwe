@@ -8,4 +8,4 @@ namespace wnd::system
         public:
             static long get_cpu_total();
     };
-};
+}; // namespace wnd::system

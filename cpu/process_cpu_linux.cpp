@@ -1,9 +1,10 @@
 #include "process_cpu_linux.hpp"
-#include <iostream>
-#include <string>
-#include <fstream>
-#include <sstream>
+
 #include <cstring>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <string>
 #include <vector>
 
 namespace wnd
@@ -16,7 +17,8 @@ namespace wnd
         path << "/proc/" << pid << "/stat";
 
         std::ifstream stream(path.str());
-        if(false == stream.is_open()) return 0;
+        if (false == stream.is_open())
+            return 0;
 
         std::vector<std::string> params;
         params.reserve(55);
@@ -24,9 +26,11 @@ namespace wnd
         std::stringstream sBuffer;
         sBuffer << stream.rdbuf();
 
-        for(std::string param; sBuffer >> param; params.push_back(std::move(param)));
+        for (std::string param; sBuffer >> param;
+             params.push_back(std::move(param)))
+            ;
 
         return std::stol(params[14]) + std::stol(params[15]);
     }
 
-};
+}; // namespace wnd

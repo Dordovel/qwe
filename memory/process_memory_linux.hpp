@@ -1,5 +1,6 @@
 #pragma once
 #include <string_view>
+
 #include "../utils/memory.hpp"
 
 namespace wnd
@@ -9,4 +10,4 @@ namespace wnd
         public:
             static wnd::Memory get_memory_for_process(std::string_view pid);
     };
-};
+}; // namespace wnd

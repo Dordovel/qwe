@@ -1,10 +1,12 @@
 #include "cpu.hpp"
-#include <cstdio>
-#include <sstream>
+
 #include <unistd.h>
-#include <fstream>
-#include <string>
+
 #include <algorithm>
+#include <cstdio>
+#include <fstream>
+#include <sstream>
+#include <string>
 
 #ifdef __linux__
 
@@ -14,7 +16,7 @@ namespace wnd::system
     {
         std::ifstream stream("/proc/stat");
 
-        if(stream.is_open())
+        if (stream.is_open())
         {
             std::string buffer;
             std::string type;
@@ -22,13 +24,14 @@ namespace wnd::system
             unsigned total = 0;
             std::stringstream sBuffer;
 
-            while(std::getline(stream, buffer))
+            while (std::getline(stream, buffer))
             {
                 sBuffer << buffer;
                 sBuffer >> type;
-                if(type == "cpu")
+                if (type == "cpu")
                 {
-                    for (; sBuffer >> value; total += value);
+                    for (; sBuffer >> value; total += value)
+                        ;
                     return total;
                 }
             }
@@ -38,5 +41,5 @@ namespace wnd::system
 
         return 0;
     }
-};
+}; // namespace wnd::system
 #endif

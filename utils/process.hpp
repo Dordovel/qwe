@@ -3,6 +3,7 @@
 #include <string>
 #include <string_view>
 #include <vector>
+
 #include "memory.hpp"
 
 namespace wnd::utils
@@ -16,12 +17,12 @@ namespace wnd::utils
                 std::string pid;
                 std::string ppid;
 
-                Memory memory = { 0 };
+                Memory memory = {0};
 
                 float p_cpu = 0;
 
                 std::vector<Process> child;
             };
-            Process get_tree_for_process(std::string_view pid);
+            static Process get_tree_for_process(int pid);
     };
-};
+}; // namespace wnd::utils
